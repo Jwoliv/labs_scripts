@@ -5,18 +5,15 @@ import cv2
 import random
 import matplotlib.pyplot as plt
 
-
 # Читання JPG зображення
 def read_jpg(filename):
-    # Читає зображення в режимі відтінків сірого
-    return cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
-
+    # Читає зображення в кольоровому режимі (BGR)
+    return cv2.imread(filename)
 
 # Запис JPG зображення
 def write_jpg(filename, image, quality=95):
     # Записує зображення у файл із заданою якістю
     cv2.imwrite(filename, image, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
-
 
 # Перетворення тексту в бінарний формат
 def text_to_bin(text):
@@ -31,12 +28,11 @@ def bin_to_text(binary):
     return ''.join(chr(int(c, 2)) for c in chars)
 
 
-# Послідовне вбудовування LSB (Least Significant Bit)
 def embed_sequential(image, message):
     # Вбудовує повідомлення в зображення за допомогою послідовного підходу до LSB
     bin_msg = text_to_bin(message)  # Перетворюємо повідомлення в бінарний формат
     img_mod = image.copy()  # Робимо копію зображення для модифікацій
-    rows, cols = img_mod.shape  # Отримуємо розміри зображення
+    rows, cols, channels = img_mod.shape  # Отримуємо розміри зображення та кількість каналів
 
     # Проходимо кожен біт повідомлення і вбудовуємо його в зображення
     for i in range(len(bin_msg)):
@@ -44,17 +40,17 @@ def embed_sequential(image, message):
         if row >= rows:  # Перевірка, щоб не вийти за межі зображення
             break
         # Модифікуємо LSB пікселя, щоб вбудувати біт повідомлення
-        img_mod[row, col] = (img_mod[row, col] & 254) | int(bin_msg[i])
+        pixel_value = img_mod[row, col]
+        img_mod[row, col] = (pixel_value & 254) | int(bin_msg[i])  # Оновлюємо LSB кожного каналу
 
     return img_mod
-
 
 # Випадкове вбудовування LSB
 def embed_random(image, message, seed):
     # Вбудовує повідомлення в зображення за допомогою випадкового підходу до LSB
     bin_msg = text_to_bin(message)  # Перетворюємо повідомлення в бінарний формат
     img_mod = image.copy()  # Робимо копію зображення для модифікацій
-    rows, cols = img_mod.shape  # Отримуємо розміри зображення
+    rows, cols, channels = img_mod.shape  # Отримуємо розміри зображення та кількість каналів
     total_pixels = rows * cols  # Загальна кількість пікселів у зображенні
 
     # Встановлюємо сид для генератора випадкових чисел для відтворюваності результату
@@ -66,7 +62,8 @@ def embed_random(image, message, seed):
     for i, pos in enumerate(positions):
         row, col = divmod(pos, cols)  # Рахуємо індекси рядка і стовпця за випадковою позицією
         # Модифікуємо LSB пікселя, щоб вбудувати біт повідомлення
-        img_mod[row, col] = (img_mod[row, col] & 254) | int(bin_msg[i])
+        pixel_value = img_mod[row, col]
+        img_mod[row, col] = (pixel_value & 254) | int(bin_msg[i])  # Оновлюємо LSB кожного каналу
 
     return img_mod
 
@@ -75,7 +72,7 @@ def embed_random(image, message, seed):
 def extract_message(image, length):
     # Витягує приховане повідомлення з зображення, використовуючи послідовне витягування LSB
     bin_msg = ''
-    rows, cols = image.shape  # Отримуємо розміри зображення
+    rows, cols, channels = image.shape  # Отримуємо розміри зображення та кількість каналів
 
     # Проходимо кожен піксель і витягуємо LSB (найменш значущий біт)
     for i in range(length * 8):
@@ -83,7 +80,8 @@ def extract_message(image, length):
         if row >= rows:  # Перевірка, щоб не вийти за межі зображення
             break
         # Витягуємо LSB з пікселя
-        bin_msg += str(image[row, col] & 1)
+        pixel_value = image[row, col]
+        bin_msg += str(pixel_value[0] & 1)  # Отримуємо найменш значущий біт першого каналу
 
     return bin_to_text(bin_msg)  # Перетворюємо бінарну строку назад у текст
 
@@ -92,7 +90,7 @@ def extract_message(image, length):
 def extract_message_random(image, length, seed):
     # Витягує приховане повідомлення з зображення з випадковим вбудовуванням LSB
     bin_msg = ''
-    rows, cols = image.shape  # Отримуємо розміри зображення
+    rows, cols, channels = image.shape  # Отримуємо розміри зображення та кількість каналів
     total_pixels = rows * cols  # Загальна кількість пікселів
 
     # Встановлюємо сид для генератора випадкових чисел
@@ -103,7 +101,9 @@ def extract_message_random(image, length, seed):
     # Витягуємо LSB з вибраних випадкових пікселів
     for pos in positions:
         row, col = divmod(pos, cols)  # Рахуємо індекси рядка і стовпця за позицією
-        bin_msg += str(image[row, col] & 1)
+        # Витягуємо LSB з пікселя (тільки перший канал)
+        pixel_value = image[row, col]
+        bin_msg += str(pixel_value[0] & 1)  # Отримуємо найменш значущий біт першого каналу
 
     return bin_to_text(bin_msg)  # Перетворюємо бінарну строку назад у текст
 
