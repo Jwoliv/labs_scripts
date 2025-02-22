@@ -10,11 +10,9 @@ def extract_message(image, length):
         if row >= rows:
             break
         pixel_value = image[row, col]
-        bin_msg += str(pixel_value[0] & 1)
+        bin_msg += str(pixel_value[0] & 1)  # Витягуємо LSB із синього каналу
     return bin_to_text(bin_msg)
 
-
-# Витягування повідомлення з випадково вбудованого зображення
 def extract_message_random(image, length, seed):
     bin_msg = ''
     rows, cols, channels = image.shape
@@ -26,6 +24,5 @@ def extract_message_random(image, length, seed):
     for pos in positions:
         row, col = divmod(pos, cols)
         pixel_value = image[row, col]
-        bin_msg += str(pixel_value[0] & 1)
-
+        bin_msg += str(pixel_value[0] & 1)  # Витягуємо LSB із синього каналу
     return bin_to_text(bin_msg)

@@ -4,19 +4,19 @@ from utils import text_to_bin
 
 # Послідовне вбудовування повідомлення
 def embed_sequential(image, message):
-    bin_msg = text_to_bin(message)  # Перетворюємо повідомлення в бінарний формат
-    img_mod = image.copy()  # Робимо копію зображення для модифікацій
-    rows, cols, channels = img_mod.shape  # Отримуємо розміри зображення та кількість каналів
+    bin_msg = text_to_bin(message)
+    img_mod = image.copy()
+    rows, cols, channels = img_mod.shape
 
     for i in range(len(bin_msg)):
-        row, col = divmod(i, cols)  # Рахуємо індекси рядка і стовпця
-        if row >= rows:  # Перевірка, щоб не вийти за межі зображення
+        row, col = divmod(i, cols)
+        if row >= rows:
             break
-        pixel_value = img_mod[row, col]
-        img_mod[row, col] = (pixel_value & 254) | int(bin_msg[i])  # Оновлюємо LSB кожного каналу
+        pixel_value = img_mod[row, col].copy()  # Копіюємо значення пікселя
+        pixel_value[0] = (pixel_value[0] & 254) | int(bin_msg[i])  # Модифікуємо лише синій канал
+        img_mod[row, col] = pixel_value
 
     return img_mod
-
 
 # Випадкове вбудовування повідомлення
 def embed_random(image, message, seed):
@@ -30,7 +30,8 @@ def embed_random(image, message, seed):
 
     for i, pos in enumerate(positions):
         row, col = divmod(pos, cols)
-        pixel_value = img_mod[row, col]
-        img_mod[row, col] = (pixel_value & 254) | int(bin_msg[i])
+        pixel_value = img_mod[row, col].copy()
+        pixel_value[0] = (pixel_value[0] & 254) | int(bin_msg[i])  # Модифікуємо лише синій канал
+        img_mod[row, col] = pixel_value
 
     return img_mod

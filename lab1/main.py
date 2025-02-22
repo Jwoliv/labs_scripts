@@ -29,5 +29,6 @@ if __name__ == '__main__':
 
     # --- Аналіз ---
     plot_histogram(image, image_seq)  # Порівняння гістрограм
+    plot_histogram(image, image_rand)  # Порівняння гістрограм
     print("MSE (Sequential):", mse(image, image_seq))
     print("MSE (Random):", mse(image, image_rand))

@@ -25,9 +25,18 @@ def mse(image1, image2):
     return np.mean((image1.astype(np.float32) - image2.astype(np.float32)) ** 2)
 
 # Аналіз гістрограми
-def plot_histogram(original, modified):
+def plot_histogram(original, modified, title="Histogram Comparison"):
     plt.figure(figsize=(10, 5))
-    plt.hist(original.ravel(), bins=256, alpha=0.5, label='Original')
-    plt.hist(modified.ravel(), bins=256, alpha=0.5, label='Modified')
+
+    # Аналізуємо лише синій канал (індекс 0 у BGR)
+    plt.hist(original[:, :, 0].ravel(), bins=256, alpha=0.7, label='Original', color='blue', edgecolor='black',
+             linewidth=0.5)
+    plt.hist(modified[:, :, 0].ravel(), bins=256, alpha=0.7, label='Modified', color='orange', edgecolor='black',
+             linewidth=0.5)
+
+    plt.title(title)
+    plt.xlabel('Pixel Intensity (Blue Channel)')
+    plt.ylabel('Frequency')
     plt.legend()
+    plt.grid(True, alpha=0.3)
     plt.show()
