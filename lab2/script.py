@@ -1,6 +1,8 @@
+import os
+import time
 import numpy as np
 from PIL import Image
-import os
+from skimage.metrics import structural_similarity as ssim
 
 UINT_8 = 'uint8' # кодування для зберігання
 MODE = 'RGB' # мод читання та запису зображення
@@ -8,7 +10,7 @@ MESSAGE = "lishchuk bohdan" # повідомлення для додавання
 RED_CHANNEL_MASK = 0b11111110  # Маска для збереження всіх бітів, крім останнього
 BIT_POSITION = 1  # Позиція біта для заміщення (останній біт)
 DIR_NAME = 'images' # назва директорії
-IMG_NAME = "image_3" # назва фото без розширення
+IMG_NAME = "image_1" # назва фото без розширення
 
 def load_image(image_path):
     """Завантажує зображення та конвертує його у формат RGB, перевіряючи існування файлу."""
