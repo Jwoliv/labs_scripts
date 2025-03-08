@@ -8,7 +8,7 @@ MESSAGE = "lishchuk bohdan" # повідомлення для додавання
 RED_CHANNEL_MASK = 0b11111110  # Маска для збереження всіх бітів, крім останнього
 BIT_POSITION = 1  # Позиція біта для заміщення (останній біт)
 DIR_NAME = 'images' # назва директорії
-IMG_NAME = "image_1" # назва фото без розширення
+IMG_NAME = "image_3" # назва фото без розширення
 
 def load_image(image_path):
     """Завантажує зображення та конвертує його у формат RGB, перевіряючи існування файлу."""
@@ -149,7 +149,7 @@ def block_hide_executor(img_arr):
     hidden_image = block_hide(img_arr, MESSAGE)
     save_image(hidden_image, f"{DIR_NAME}/{IMG_NAME}_hidden.jpg")
     extracted_message = extract_block_data(hidden_image)
-    print(f"extracted message {extracted_message}")
+    print(f"extracted message [{extracted_message}]")
 
 
 def change_palette_executor(img_arr):
