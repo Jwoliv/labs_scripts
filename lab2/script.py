@@ -7,6 +7,8 @@ MODE = 'RGB' # мод читання та запису зображення
 MESSAGE = "lishchuk bohdan" # повідомлення для додавання в зображення
 RED_CHANNEL_MASK = 0b11111110  # Маска для збереження всіх бітів, крім останнього
 BIT_POSITION = 1  # Позиція біта для заміщення (останній біт)
+DIR_NAME = 'images' # назва директорії
+IMG_NAME = "image_1" # назва фото без розширення
 
 def load_image(image_path):
     """Завантажує зображення та конвертує його у формат RGB, перевіряючи існування файлу."""
@@ -136,26 +138,40 @@ def pixels_to_rbg_channels(img_arr):
     return img_arr.reshape(-1, 3)
 
 
+def swap_pixels_executor(img_arr):
+    permuted_image = permute_pixels(img_arr, seed=42)
+    save_image(permuted_image, f"{DIR_NAME}/{IMG_NAME}_permuted.jpg")
+    restored_image = inverse_permute_pixels(permuted_image, seed=42)
+    save_image(restored_image, f"{DIR_NAME}/{IMG_NAME}_restored.jpg")
+
+
+def block_hide_executor(img_arr):
+    hidden_image = block_hide(img_arr, MESSAGE)
+    save_image(hidden_image, f"{DIR_NAME}/{IMG_NAME}_hidden.jpg")
+    extracted_message = extract_block_data(hidden_image)
+    print(f"extracted message {extracted_message}")
+
+
+def change_palette_executor(img_arr):
+    secret_color = (99, 99, 99)
+    encoded_palette_image = apply_palette_substitution(img_arr, secret_color)
+    save_image(encoded_palette_image, f"{DIR_NAME}/{IMG_NAME}_palette_encoded.jpg")
+    decoded_palette_image = reverse_palette_substitution(encoded_palette_image, secret_color)
+    save_image(decoded_palette_image, f"{DIR_NAME}/{IMG_NAME}_palette_decoded.jpg")
+
+
+def generate_img_arr():
+    image = load_image(f"{DIR_NAME}/{IMG_NAME}.jpg")
+    return np.array(image)
+
 if __name__ == '__main__':
-    dir_name = 'images'
-    image_name = "image_1"
-    image = load_image(f"{dir_name}/{image_name}.jpg")
-    image_array = np.array(image)
+    image_array = generate_img_arr()
 
     # Перестановка пікселів
-    permuted_image = permute_pixels(image_array, seed=42)
-    save_image(permuted_image, f"{dir_name}/{image_name}_permuted.jpg")
-    restored_image = inverse_permute_pixels(permuted_image, seed=42)
-    save_image(restored_image, f"{dir_name}/{image_name}_restored.jpg")
+    swap_pixels_executor(image_array)
 
     # Блокове приховування
-    hidden_image = block_hide(image_array, MESSAGE)
-    save_image(hidden_image, f"{dir_name}/{image_name}_hidden.jpg")
-    print("Extracted Message:", extract_block_data(hidden_image))
+    block_hide_executor(image_array)
 
     # Заміна палітри
-    secret_color = (99, 99, 99)
-    encoded_palette_image = apply_palette_substitution(image_array, secret_color)
-    save_image(encoded_palette_image, f"{dir_name}/{image_name}_palette_encoded.jpg")
-    decoded_palette_image = reverse_palette_substitution(encoded_palette_image, secret_color)
-    save_image(decoded_palette_image, f"{dir_name}/{image_name}_palette_decoded.jpg")
+    change_palette_executor(image_array)
