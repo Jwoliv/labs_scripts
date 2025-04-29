@@ -60,7 +60,7 @@ def extract_watermark_dct(watermarked_img, container_img, wm_shape, strength=10)
     return extracted
 
 
-container_path = "images/image_1.jpg"
+container_path = "images/image_2.jpg"
 watermark_path = "images/watermark.png"
 visible_output_path = "images/watermarked_dct.png"
 extracted_output_path = "images/extracted_dct.png"
